@@ -1,0 +1,8 @@
+.git
+.venv
+data
+models
+results
+app/target
+training
+**/__pycache__

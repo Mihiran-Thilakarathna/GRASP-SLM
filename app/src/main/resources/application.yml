@@ -1,0 +1,55 @@
+server:
+  # Hugging Face Spaces (Docker runtime) expects port 7860.
+  port: ${PORT:7860}
+
+spring:
+  application:
+    name: grasp-slm
+  main:
+    banner-mode: off
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+  mvc:
+    async:
+      request-timeout: 900s
+
+grasp:
+  models:
+    embedding-model: ${GRASP_EMBEDDING_MODEL:models/bge-small-en-v1.5/model.onnx}
+    embedding-tokenizer: ${GRASP_EMBEDDING_TOKENIZER:models/bge-small-en-v1.5/tokenizer.json}
+    reranker-model: ${GRASP_RERANKER_MODEL:models/bge-reranker-base/model.onnx}
+    reranker-tokenizer: ${GRASP_RERANKER_TOKENIZER:models/bge-reranker-base/tokenizer.json}
+  chunking:
+    min-tokens: 400
+    target-tokens: 500
+    max-tokens: 600
+  retrieval:
+    mode: ${GRASP_RETRIEVAL_MODE:HYBRID}
+    rerank: ${GRASP_RERANK:true}
+    candidates-per-retriever: 20
+    rrf-k: 60
+    rerank-candidates: 10
+    max-context-chunks: 6
+  llm:
+    # llamacpp = in-process GGUF (deployment); openai = OpenAI-compatible server (GPU evaluation); none
+    backend: ${GRASP_LLM_BACKEND:llamacpp}
+    model-path: ${GRASP_LLM_MODEL_PATH:models/llm/model.gguf}
+    context-size: ${GRASP_LLM_CONTEXT_SIZE:8192}
+    threads: ${GRASP_LLM_THREADS:0}
+    max-tokens: 1024
+    temperature: 0.0
+    seed: 42
+    grammar: ${GRASP_LLM_GRAMMAR:true}
+    base-url: ${GRASP_LLM_BASE_URL:http://localhost:8081/v1}
+    api-key: ${GRASP_LLM_API_KEY:none}
+    model-name: ${GRASP_LLM_MODEL_NAME:grasp-slm}
+    response-format: ${GRASP_LLM_RESPONSE_FORMAT:json_schema}
+    timeout-seconds: 900
+
+logging:
+  level:
+    root: INFO
+    org.apache.pdfbox: ERROR
+    org.apache.fontbox: ERROR

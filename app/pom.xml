@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>lk.ac.rjt</groupId>
+    <artifactId>grasp-slm</artifactId>
+    <version>0.1.0</version>
+    <name>GRASP-SLM application</name>
+    <description>Grounded Retrieval-Augmented Structured Paper analysis with a Small Language Model</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <lucene.version>10.6.0</lucene.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
+        <langchain4j.version>1.23.0</langchain4j.version>
+        <langchain4j.beta.version>1.23.0-beta33</langchain4j.beta.version>
+        <!-- Pinned: newer java-llama.cpp builds must be re-tested with the GGUF model (proposal, Table 6). -->
+        <java-llama.version>4.2.0</java-llama.version>
+        <json-schema-validator.version>1.5.9</json-schema-validator.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- Ingestion -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
+        </dependency>
+
+        <!-- Hybrid retrieval: BM25 text field + HNSW vector field -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analysis-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+        <!-- RAG orchestration, ONNX embeddings and cross-encoder re-ranking -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-core</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-embeddings</artifactId>
+            <version>${langchain4j.beta.version}</version>
+        </dependency>
+        <!-- Bundled quantised bge-small-en-v1.5, used when no exported ONNX file is configured. -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-embeddings-bge-small-en-v15-q</artifactId>
+            <version>${langchain4j.beta.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-onnx-scoring</artifactId>
+            <version>${langchain4j.beta.version}</version>
+        </dependency>
+
+        <!-- GGUF inference through llama.cpp -->
+        <dependency>
+            <groupId>de.kherud</groupId>
+            <artifactId>llama</artifactId>
+            <version>${java-llama.version}</version>
+        </dependency>
+
+        <!-- Output validation -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${json-schema-validator.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>grasp-slm</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- Schema, prompts and field queries shared with the Python training code. -->
+            <resource>
+                <directory>${project.basedir}/../shared</directory>
+                <targetPath>shared</targetPath>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Tests that need real model files are tagged and run only with -Pmodels. -->
+                    <excludedGroups>models</excludedGroups>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>models</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups combine.self="override"/>
+                            <groups>models</groups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

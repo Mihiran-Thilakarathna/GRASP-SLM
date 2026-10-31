@@ -1,0 +1,8 @@
+# Local data pipeline (collection, labelling, review, dataset building) and evaluation client.
+huggingface_hub>=0.25
+requests>=2.31
+jsonschema>=4.21
+gradio>=4.44
+pandas>=2.1
+tabulate>=0.9
+pytest>=8

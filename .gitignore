@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Java
+app/target/
+
+# Large or private artefacts: kept on the Hugging Face Hub, not in git
+data/
+models/
+results/*.jsonl
+results/ragas_*.csv
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

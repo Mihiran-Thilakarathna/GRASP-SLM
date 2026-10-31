@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GRASP-SLM</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<main class="page">
+    <header>
+        <h1>GRASP-SLM</h1>
+        <p class="lead">Structured, citation-backed analysis of research papers using a fine-tuned small language
+            model with hybrid retrieval. Runs fully on CPU.</p>
+    </header>
+
+    <div class="error" th:if="${error}" th:text="${error}">Error</div>
+
+    <form class="card" method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="upload">
+        <label class="field">
+            <span>Research paper (PDF, English)</span>
+            <input type="file" name="file" accept="application/pdf" required>
+        </label>
+        <div class="row">
+            <label class="field">
+                <span>Retrieval</span>
+                <select name="retrieval">
+                    <option th:each="m : ${modes}" th:value="${m}" th:text="${m}"
+                            th:selected="${m == defaults.mode}">HYBRID</option>
+                </select>
+            </label>
+            <label class="check">
+                <input type="checkbox" name="rerank" value="true" th:checked="${defaults.rerank}">
+                <span>Cross-encoder re-ranking</span>
+            </label>
+        </div>
+        <button type="submit" id="submit">Analyse paper</button>
+        <p class="hint" id="wait" hidden>Analysing… this takes one to three minutes on a free CPU.</p>
+    </form>
+
+    <footer>
+        Output fields: core problem, proposed method, key metrics, limitations. Every claim cites the chunk and
+        page it came from. API: <code>POST /api/analyze</code> (multipart <code>file</code>).
+    </footer>
+</main>
+<script>
+    document.getElementById('upload').addEventListener('submit', function () {
+        document.getElementById('submit').disabled = true;
+        document.getElementById('wait').hidden = false;
+    });
+</script>
+</body>
+</html>

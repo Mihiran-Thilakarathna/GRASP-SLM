@@ -1,0 +1,8 @@
+# Scoring (BERTScore, Ragas) and ONNX export. Heavy: installs PyTorch.
+-r requirements.txt
+bert-score==0.3.13
+ragas==0.2.15
+langchain-openai>=0.2,<0.4
+langchain-huggingface>=0.1,<0.4
+sentence-transformers>=3.0
+optimum[onnxruntime]>=1.23

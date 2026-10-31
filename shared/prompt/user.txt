@@ -1,0 +1,11 @@
+Paper title: {{title}}
+
+Context chunks:
+
+{{context}}
+
+Task: Analyse this paper and return a JSON object with these fields:
+- core_problem: the problem or research question the paper addresses (text + citations)
+- proposed_method: the method, model or approach the paper proposes (text + citations)
+- key_metrics: the main quantitative results, each with metric, value, dataset and citations
+- limitations: limitations stated by the authors (text + citations)

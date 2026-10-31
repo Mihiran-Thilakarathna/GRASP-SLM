@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grasp-slm/analysis.schema.json",
+  "title": "GRASP-SLM structured paper analysis",
+  "type": "object",
+  "properties": {
+    "core_problem": { "$ref": "#/$defs/claim" },
+    "proposed_method": { "$ref": "#/$defs/claim" },
+    "key_metrics": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "properties": {
+          "metric": { "type": "string" },
+          "value": { "type": "string" },
+          "dataset": { "type": "string" },
+          "citations": { "$ref": "#/$defs/citations" }
+        },
+        "required": ["metric", "value", "dataset", "citations"],
+        "additionalProperties": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/claim" }
+    }
+  },
+  "required": ["core_problem", "proposed_method", "key_metrics", "limitations"],
+  "additionalProperties": false,
+  "$defs": {
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": { "type": "string", "pattern": "^c[0-9]+$" }
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "citations": { "$ref": "#/$defs/citations" }
+      },
+      "required": ["text", "citations"],
+      "additionalProperties": false
+    }
+  }
+}

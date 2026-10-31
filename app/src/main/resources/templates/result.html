@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GRASP-SLM analysis</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<main class="page" th:with="a=${result.analysis}">
+    <p><a th:href="@{/}">&larr; Analyse another paper</a></p>
+    <h1 th:text="${result.title}">Paper title</h1>
+    <p class="meta">
+        <span th:text="${fileName}">file.pdf</span> ·
+        <span th:text="${result.numPages} + ' pages'">10 pages</span> ·
+        <span th:text="${result.numChunks} + ' chunks'">40 chunks</span> ·
+        <span th:text="${result.retrieval.mode} + (${result.reranked} ? ' + re-ranking' : '')">HYBRID</span> ·
+        <span th:text="${#numbers.formatDecimal(result.timingsMs['total'] / 1000.0, 1, 1)} + ' s'">60 s</span>
+    </p>
+
+    <div class="error" th:unless="${result.schemaValid}">
+        The model output did not fully match the schema.
+        <ul><li th:each="e : ${result.errors}" th:text="${e}">error</li></ul>
+    </div>
+    <div class="warn" th:if="${result.unknownCitations != null and !result.unknownCitations.isEmpty()}"
+         th:text="'Citations not found in the retrieved context: ' + ${#strings.listJoin(result.unknownCitations, ', ')}">
+    </div>
+
+    <th:block th:if="${a != null}">
+        <section class="card">
+            <h2>Core problem</h2>
+            <p th:text="${a.path('core_problem').path('text').asText()}">…</p>
+            <p class="cites"><a th:each="c : ${a.path('core_problem').path('citations')}"
+                                th:href="'#' + ${c.asText()}" th:text="${c.asText()}">c1</a></p>
+        </section>
+        <section class="card">
+            <h2>Proposed method</h2>
+            <p th:text="${a.path('proposed_method').path('text').asText()}">…</p>
+            <p class="cites"><a th:each="c : ${a.path('proposed_method').path('citations')}"
+                                th:href="'#' + ${c.asText()}" th:text="${c.asText()}">c1</a></p>
+        </section>
+        <section class="card">
+            <h2>Key metrics</h2>
+            <p th:if="${a.path('key_metrics').isEmpty()}"><em>No metrics reported in the retrieved context.</em></p>
+            <div class="table-wrap" th:unless="${a.path('key_metrics').isEmpty()}">
+                <table>
+                    <thead><tr><th>Metric</th><th>Value</th><th>Dataset</th><th>Source</th></tr></thead>
+                    <tbody>
+                    <tr th:each="m : ${a.path('key_metrics')}">
+                        <td th:text="${m.path('metric').asText()}">Accuracy</td>
+                        <td class="num" th:text="${m.path('value').asText()}">92.1</td>
+                        <td th:text="${m.path('dataset').asText()}">GLUE</td>
+                        <td class="cites"><a th:each="c : ${m.path('citations')}" th:href="'#' + ${c.asText()}"
+                                             th:text="${c.asText()}">c1</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="card">
+            <h2>Limitations</h2>
+            <p th:if="${a.path('limitations').isEmpty()}"><em>No limitations stated in the retrieved context.</em></p>
+            <ul>
+                <li th:each="l : ${a.path('limitations')}">
+                    <span th:text="${l.path('text').asText()}">…</span>
+                    <span class="cites"><a th:each="c : ${l.path('citations')}" th:href="'#' + ${c.asText()}"
+                                           th:text="${c.asText()}">c1</a></span>
+                </li>
+            </ul>
+        </section>
+    </th:block>
+
+    <section>
+        <h2>Evidence</h2>
+        <p class="hint">The chunks the model was given. Citations above link here.</p>
+        <details class="chunk" th:each="c : ${result.context}" th:id="${c.id}">
+            <summary>
+                <strong th:text="${c.id}">c1</strong> ·
+                <span th:text="${c.section}">Results</span> ·
+                <span th:text="${c.pageStart == c.pageEnd} ? 'p. ' + ${c.pageStart} : 'pp. ' + ${c.pageStart} + '-' + ${c.pageEnd}">p. 3</span>
+            </summary>
+            <p class="chunk-text" th:text="${c.text}">…</p>
+        </details>
+    </section>
+
+    <details>
+        <summary>Raw model output</summary>
+        <pre th:text="${result.rawOutput}">{}</pre>
+    </details>
+    <footer th:text="'Model: ' + ${result.model}">Model</footer>
+</main>
+<script>
+    // Opening a citation link expands the chunk it points to.
+    function openTarget() {
+        var el = location.hash && document.getElementById(location.hash.slice(1));
+        if (el && el.tagName === 'DETAILS') { el.open = true; }
+    }
+    window.addEventListener('hashchange', openTarget);
+    openTarget();
+</script>
+</body>
+</html>

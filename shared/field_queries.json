@@ -1,0 +1,22 @@
+[
+  {
+    "field": "core_problem",
+    "dense": "What problem or research question does this paper address and why does it matter?",
+    "keywords": "problem challenge motivation address gap question existing methods suffer limited abstract introduction"
+  },
+  {
+    "field": "proposed_method",
+    "dense": "What method, model, architecture or approach does this paper propose?",
+    "keywords": "we propose method approach model architecture framework algorithm introduce novel design"
+  },
+  {
+    "field": "key_metrics",
+    "dense": "What are the main quantitative results, scores and improvements reported on each dataset?",
+    "keywords": "results accuracy F1 BLEU score performance improvement outperforms baseline dataset table % achieves"
+  },
+  {
+    "field": "limitations",
+    "dense": "What limitations, weaknesses or future work do the authors acknowledge?",
+    "keywords": "limitations limitation future work drawback weakness fails however does not restricted only"
+  }
+]
