@@ -15,11 +15,11 @@
 #
 # Configuration **E** (Q4_K_M on CPU, the deployed set-up) is run on a CPU machine: see the project guide.
 #
-# Before running: GPU T4, Internet on, `HF_TOKEN` secret, set `HF_USER` and `REPO_URL`.
+# Before running: GPU T4, Internet on, `HF_TOKEN` secret, set `HF_USER`.
 
 # %%
 HF_USER = "your-hf-username"                               # <-- change this
-REPO_URL = "https://github.com/your-github-user/GRASP-SLM"  # <-- change this
+REPO_URL = "https://github.com/Mihiran-Thilakarathna/GRASP-SLM"
 DATASET_REPO = f"{HF_USER}/grasp-slm-papers"
 GGUF_REPO = f"{HF_USER}/grasp-slm-gguf"
 MODELS = {

@@ -18,11 +18,10 @@ What the baseline test showed (good material for your report):
   (step 3), try improving the wording in `shared/field_queries.json`; Java and Python both read that file.
 - About 22 s of the time is the fp32 re-ranker on CPU. For the free Space (2 CPUs), consider the int8 export:
   `python -m grasp_train.export_onnx --quantize` (needs `requirements-eval.txt`), then upload it with `grasp_train.hub onnx`.
-- Docker Desktop is not running on your PC, so the Docker image was not built locally. Start Docker
-  Desktop to try `docker build -t grasp-slm .`; GitHub Actions also builds it on every push.
+- Docker: `docker build -t grasp-slm .` then `docker run -p 7860:7860 grasp-slm` (Docker Desktop must be running).
 
 ## 0. One-time setup (accounts)
-1. Create free accounts: **Hugging Face**, **GitHub**, **Kaggle** (verify your phone on Kaggle to unlock GPUs).
+1. Create free accounts: **Hugging Face** and **Kaggle** (verify your phone on Kaggle to unlock GPUs). GitHub is already done.
 2. Hugging Face → Settings → Access Tokens → create a **Write** token.
 3. Get a free teacher/judge API key: **Groq** (console.groq.com) or **Google AI Studio** (Gemini).
 4. Put the keys in your shell (never in code):
@@ -31,13 +30,16 @@ What the baseline test showed (good material for your report):
    export GROQ_API_KEY=gsk_xxx
    ```
 
-## 1. Push the code to GitHub
+## 1. GitHub: done ✅
+The code is at https://github.com/Mihiran-Thilakarathna/GRASP-SLM (branch `main`).
+GitHub Actions runs the Java tests, the Python tests and the Docker build on every push.
+To publish later changes:
 ```bash
-git add . && git commit -m "GRASP-SLM initial implementation"
-git remote add origin https://github.com/<you>/GRASP-SLM.git
-git push -u origin main
+git add -A && git commit -m "Describe the change" && git push
 ```
-GitHub Actions then runs the Java and Python tests automatically.
+Polish the repo page: open the repo → ⚙️ next to **About** → add a description
+("Structured, citation-backed research paper analysis with a QLoRA+DPO tuned 1.5B model and hybrid RAG; Java + Python")
+and the topics `rag`, `llm`, `qlora`, `dpo`, `spring-boot`, `lucene`, `llama-cpp`, `small-language-models`.
 
 ## 2. Collect papers (about 2-3 hours, runs by itself)
 ```bash
@@ -79,7 +81,7 @@ Upload each notebook from `training/notebooks/` to Kaggle. In each one: set `HF_
 1. `01_sft_qlora.ipynb`: GPU, about 1 hour
 2. `02_dpo.ipynb`: GPU, about 1 hour
 3. `03_export_gguf.ipynb`: **CPU only** (saves GPU quota)
-4. `04_ablation_eval.ipynb`: GPU, also set `REPO_URL`; runs configurations A-D
+4. `04_ablation_eval.ipynb`: GPU, runs configurations A-D
 
 If a session stops, run the same notebook again: it resumes from the last checkpoint.
 
